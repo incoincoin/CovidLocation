@@ -7,9 +7,7 @@ import time
 # 在 https://github.com/Votess4All/COVID-19-SH-2022 基础上修改
 
 
-def get_city_disease_info_after_0406(
-        shanghaifabu_url,
-        city_name="上海市"):
+def get_city_disease_info_after_0406(shanghaifabu_url, city_name="上海市"):
     """
     适用于2022年4月6日及之后的数据爬取及位置匹配
     给定一篇上海发布的文章，找到相关区内公布的具体感染人群所在地址
@@ -24,12 +22,12 @@ def get_city_disease_info_after_0406(
     location_div = soup.find("div", attrs={"class": "rich_media_content"})
 
     # 区名定位
-    locate_section_div = location_div.findAll(
-        "section", attrs={"data-role": "title"})
+    locate_section_div = location_div.findAll("section",
+                                              attrs={"data-role": "title"})
 
     # 居住地信息定位，注意locate_section_div_1[2:]是后面使用的数据
-    locate_section_div_1 = location_div.findAll(
-        "section", attrs={"data-autoskip": "1"})
+    locate_section_div_1 = location_div.findAll("section",
+                                                attrs={"data-autoskip": "1"})
 
     city_area_street = {f"{city_name}": []}
     if len(locate_section_div) == len(locate_section_div_1[2:]):
@@ -39,10 +37,10 @@ def get_city_disease_info_after_0406(
             ps = locate_section_div_1[2:][i].findAll("p")
             area_xiaoqu = []
             for j, area_ps in enumerate(ps):
-                if j <= 1 or j >= len(ps)-2:
+                if j <= 1 or j >= len(ps) - 2:
                     continue
 
-                area_xiaoqu.append(f"{city_name}"+area_name +
+                area_xiaoqu.append(f"{city_name}" + area_name +
                                    area_ps.text.strip("，"))
             city_area_street[f"{city_name}"].append({area_name: area_xiaoqu})
     else:
@@ -51,9 +49,7 @@ def get_city_disease_info_after_0406(
     return city_area_street
 
 
-def get_city_disease_info(
-        shanghaifabu_url,
-        city_name="上海市"):
+def get_city_disease_info(shanghaifabu_url, city_name="上海市"):
     """
     适用于2022年3月18日-2022年4月5日的数据爬取及位置匹配
     给定一篇上海发布的文章，找到相关区内公布的具体感染人群所在地址
@@ -65,8 +61,8 @@ def get_city_disease_info(
 
     soup = BeautifulSoup(demo, 'html.parser')
     location_div = soup.find("div", attrs={"class": "rich_media_content"})
-    locate_section_div = location_div.findAll(
-        "section", attrs={"data-role": "title"})
+    locate_section_div = location_div.findAll("section",
+                                              attrs={"data-role": "title"})
 
     city_area_street = {f"{city_name}": []}
     for i, sub_div in enumerate(locate_section_div):
@@ -77,10 +73,10 @@ def get_city_disease_info(
 
         area_xiaoqu = []
         for j, area_ps in enumerate(ps):
-            if j <= 1 or j >= len(ps)-2:
+            if j <= 1 or j >= len(ps) - 2:
                 continue
 
-            area_xiaoqu.append(f"{city_name}"+area_name +
+            area_xiaoqu.append(f"{city_name}" + area_name +
                                area_ps.text.strip("，"))
         city_area_street[f"{city_name}"].append({area_name: area_xiaoqu})
 
@@ -117,10 +113,10 @@ def jiadingProcess(data):
 
     df = data[data['area_name'] == '嘉定区']
 
-    filtername = ['安亭镇', '南翔镇', '江桥镇', '马陆镇',
-                  '嘉定镇街道', '嘉定工业区', '徐行镇',
-                  '华亭镇', '外冈镇', '新成路街道',
-                  '真新街道', '菊园新区']
+    filtername = [
+        '安亭镇', '南翔镇', '江桥镇', '马陆镇', '嘉定镇街道', '嘉定工业区', '徐行镇', '华亭镇', '外冈镇',
+        '新成路街道', '真新街道', '菊园新区'
+    ]
 
     reslist = []
     for addlist in df['loc_name'].str.split("、"):
@@ -131,7 +127,7 @@ def jiadingProcess(data):
                 if i == 0:
                     reslist.append(addlist[i])
                 else:
-                    reslist.append(jiedaoname+addlist[i])
+                    reslist.append(jiedaoname + addlist[i])
         else:
             reslist.append(addlist[0])
 
@@ -161,7 +157,6 @@ def transfertodf(city_disease_info, city_name="上海市"):
                     df_list.append({
                         "area_name": key,
                         "loc_name": jiedao,
-
                     })
 
             df = pd.DataFrame(df_list, columns=df_list[0].keys())
@@ -210,7 +205,7 @@ def getCoordinatesFromBaidu(data, locstring):
         try:
             res = r.json()
         except:
-            print("当前地点:"+str(address))
+            print("当前地点:" + str(address))
             location.append(address)
             locationinfo.append('Nah')
             addr.append('Nah')
@@ -226,7 +221,7 @@ def getCoordinatesFromBaidu(data, locstring):
                     locationinfo.append(res['results'][0]['location'])
                     addr.append(res['results'][0]['address'])
                 except:
-                    print("KeyError! 当前地点:"+str(address))
+                    print("KeyError! 当前地点:" + str(address))
 
             else:
                 location.append(address)
@@ -234,14 +229,17 @@ def getCoordinatesFromBaidu(data, locstring):
                 addr.append('Nah')
 
         else:
-            print(str(address)+'status='+str(res['status']))
+            print(str(address) + 'status=' + str(res['status']))
             location.append(address)
             locationinfo.append('Nah')
             addr.append('Nah')
 
         time.sleep(2)
 
-    resultdf = pd.DataFrame({'location': location, 'locationinfo': locationinfo,
-                             'addr': addr})
+    resultdf = pd.DataFrame({
+        'location': location,
+        'locationinfo': locationinfo,
+        'addr': addr
+    })
 
     return resultdf

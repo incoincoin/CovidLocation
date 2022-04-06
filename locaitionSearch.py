@@ -168,7 +168,7 @@ def getCoordinatesFromBaidu(data, locstring):
             r = requests.get(url, params=dicts, timeout=10)
         except:
             # 如果碰到无法使用的key，换用另一个正常的key
-            key = '2CNYMzwKRlMiCV3ecothCGRPCIdTnx7t'
+            key = 'Another key'
             dicts['ak'] = key
             r = requests.get(url, params=dicts, timeout=10)
 

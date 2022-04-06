@@ -5,13 +5,13 @@ from bs4 import BeautifulSoup
 import time
 
 # 在 https://github.com/Votess4All/COVID-19-SH-2022 基础上修改
-# 适用于2022年4月6日及之后的数据爬取及位置匹配
 
 
 def get_city_disease_info_after_0406(
         shanghaifabu_url,
         city_name="上海市"):
     """
+    适用于2022年4月6日及之后的数据爬取及位置匹配
     给定一篇上海发布的文章，找到相关区内公布的具体感染人群所在地址
     例如：shanghaifabu_url = "https://mp.weixin.qq.com/s/djwW3S9FUYBE2L5Hj94a3A"
     """
@@ -31,8 +31,7 @@ def get_city_disease_info_after_0406(
     locate_section_div_1 = location_div.findAll(
         "section", attrs={"data-autoskip": "1"})
 
-    city_name = "上海市"
-
+    city_area_street = {f"{city_name}": []}
     if len(locate_section_div) == len(locate_section_div_1[2:]):
         for i in range(len(locate_section_div)):
             area_name = locate_section_div[i].find("strong").text
@@ -48,6 +47,42 @@ def get_city_disease_info_after_0406(
             city_area_street[f"{city_name}"].append({area_name: area_xiaoqu})
     else:
         print('区名标题栏与地址栏数量不相等')
+
+    return city_area_street
+
+
+def get_city_disease_info(
+        shanghaifabu_url,
+        city_name="上海市"):
+    """
+    适用于2022年3月18日-2022年4月5日的数据爬取及位置匹配
+    给定一篇上海发布的文章，找到相关区内公布的具体感染人群所在地址
+    例如：shanghaifubu_url = "https://mp.weixin.qq.com/s/w8UqtdmBtdLQitM7emOVjw"
+    """
+
+    r = requests.get(shanghaifabu_url)
+    demo = r.text
+
+    soup = BeautifulSoup(demo, 'html.parser')
+    location_div = soup.find("div", attrs={"class": "rich_media_content"})
+    locate_section_div = location_div.findAll(
+        "section", attrs={"data-role": "title"})
+
+    city_area_street = {f"{city_name}": []}
+    for i, sub_div in enumerate(locate_section_div):
+
+        # strong: 加粗显示
+        area_name = sub_div.find("strong").text
+        ps = sub_div.findAll("p")
+
+        area_xiaoqu = []
+        for j, area_ps in enumerate(ps):
+            if j <= 1 or j >= len(ps)-2:
+                continue
+
+            area_xiaoqu.append(f"{city_name}"+area_name +
+                               area_ps.text.strip("，"))
+        city_area_street[f"{city_name}"].append({area_name: area_xiaoqu})
 
     return city_area_street
 

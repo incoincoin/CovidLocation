@@ -154,7 +154,7 @@ def getCoordinatesFromBaidu(data, locstring):
     for address in data[locstring]:
 
         url = 'http://api.map.baidu.com/place/v2/search?'
-        key = 'EAWGCrvFarzGWypznVXDS2s6XUlgE1m8'
+        key = 'your key'
         dicts = {
             'query': address,
             'region': '上海市',

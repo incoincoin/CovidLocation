@@ -195,17 +195,10 @@ def getCoordinatesFromBaidu(data, locstring):
             'ak': key
         }
         try:
-            r = requests.get(url, params=dicts, timeout=10)
-        except:
-            # 如果碰到无法使用的key，换用另一个正常的key
-            key = 'Another key'
-            dicts['ak'] = key
-            r = requests.get(url, params=dicts, timeout=10)
-
-        try:
+            r = requests.get(url, params=dicts, timeout=(20, 20))
             res = r.json()
-        except:
-            print("当前地点:" + str(address))
+        except requests.exceptions.ConnectTimeout:
+            print("当前地点:" + str(address) + "ConnectionError")
             location.append(address)
             locationinfo.append('Nah')
             addr.append('Nah')
@@ -220,7 +213,7 @@ def getCoordinatesFromBaidu(data, locstring):
                     location.append(address)
                     locationinfo.append(res['results'][0]['location'])
                     addr.append(res['results'][0]['address'])
-                except:
+                except KeyError:
                     print("KeyError! 当前地点:" + str(address))
 
             else:

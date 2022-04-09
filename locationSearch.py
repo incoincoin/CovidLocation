@@ -5,6 +5,22 @@ from bs4 import BeautifulSoup
 import time
 
 # 在 https://github.com/Votess4All/COVID-19-SH-2022 基础上修改
+"""
+3月1日以来，上海发布微信公众号每日公布感染者居住地信息或涉疫地址信息，格式有以下几种：
+1. 3月1日: 该病例涉及的轨迹为xxx，xxx。
+2. 3月2日: 居住在xxx，
+3. 3月3日: 居住于xxx。
+4. 3月4日: 居住于xxx，
+5. 3月6日: 居住地为xxx，
+6. 3月7日-3月17日: 居住于xxx，
+7. 3月18日-4月5日: 单独发布居住地信息，各区之间用一个文本框显示。
+8. 4月6日及之后: 单独发布居住地信息，各区居住地信息用文本框显示。
+
+3月1日-3月6日的文本，使用简单的正则表达式即可单独提取。
+3月7日-3月17日的文本，可使用同一规则提取。
+3月18日-4月5日的文本，使用 get_city_disease_info 函数提取。
+4月6日及之后，使用 get_city_disease_info_after_0406 函数提取。
+"""
 
 
 def get_city_disease_info_after_0406(shanghaifabu_url, city_name="上海市"):
